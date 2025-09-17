@@ -45,7 +45,13 @@ class StatusManager {
     }
 
     async loadStatusVisualization(isLiveMode = true) {
-        if (!this.currentDevice) return;
+        console.log('Status Manager - loadStatusVisualization called with isLiveMode:', isLiveMode);
+        console.log('Status Manager - Current device:', this.currentDevice);
+        
+        if (!this.currentDevice) {
+            console.log('Status Manager - No current device, returning early');
+            return;
+        }
 
         // Clean up existing chart to prevent canvas reuse errors
         if (this.statusChart) {
@@ -55,34 +61,54 @@ class StatusManager {
 
         try {
             // Show loading
+            console.log('Status Manager - Showing loading...');
             this.showStatusLoading();
 
             // Get time range
             const timeRange = this.getTimeRange(isLiveMode);
+            console.log('Status Manager - Time range:', timeRange);
             
             // Load status history
+            console.log('Status Manager - Loading state history...');
             const history = await window.lawnmowerAPI.getStateHistory(
                 this.currentDevice.id,
                 timeRange.from,
                 timeRange.to
             );
 
+            console.log('Status Manager - Received history:', history.length, 'entries');
+
             if (history.length === 0) {
+                console.log('Status Manager - No history data, showing no data message');
                 this.showNoStatusData();
                 return;
             }
 
             // Process status data
+            console.log('Status Manager - Processing status data...');
             this.processStatusData(history, timeRange);
+            console.log('Status Manager - Processed data:', this.statusData.length, 'status entries');
+            
+            // Hide loading before rendering to restore canvas
+            console.log('Status Manager - Hiding loading overlay...');
+            this.hideStatusLoading();
+            
+            // Small delay to ensure DOM is updated
+            await new Promise(resolve => setTimeout(resolve, 50));
             
             // Render visualizations
+            console.log('Status Manager - Starting chart rendering...');
             await this.renderStatusChart();
+            console.log('Status Manager - Starting timeline rendering...');
             this.renderTimeline();
+            console.log('Status Manager - Rendering complete');
 
         } catch (error) {
-            console.error('Failed to load status data:', error);
+            console.error('Status Manager - Error occurred:', error);
             this.showStatusError('Failed to load status data');
         } finally {
+            // Make sure loading is hidden even if there's an error
+            console.log('Status Manager - Finally block - hiding loading...');
             this.hideStatusLoading();
         }
     }
@@ -142,7 +168,26 @@ class StatusManager {
 
     async renderStatusChart() {
         const canvas = document.getElementById('statusChart');
-        if (!canvas || this.statusData.length === 0) return;
+        console.log('Status Manager - Rendering chart, canvas found:', !!canvas);
+        console.log('Status Manager - Canvas element:', canvas);
+        console.log('Status Manager - All canvas elements:', document.querySelectorAll('canvas'));
+        console.log('Status Manager - All elements with statusChart id:', document.querySelectorAll('#statusChart'));
+        console.log('Status Manager - Status data length:', this.statusData.length);
+        
+        if (!canvas) {
+            console.log('Status Manager - Trying to find canvas in DOM...');
+            const allElements = document.querySelectorAll('*');
+            for (let el of allElements) {
+                if (el.id === 'statusChart') {
+                    console.log('Status Manager - Found element with statusChart id:', el);
+                }
+            }
+        }
+        
+        if (!canvas || this.statusData.length === 0) {
+            console.log('Status Manager - Cannot render chart: no canvas or no data');
+            return;
+        }
 
         // Destroy existing chart if it exists
         if (this.statusChart) {
@@ -151,11 +196,14 @@ class StatusManager {
         }
 
         const ctx = canvas.getContext('2d');
+        console.log('Status Manager - Canvas context:', !!ctx);
 
         // Prepare chart data
         const labels = this.statusData.map(item => item.stateName);
         const data = this.statusData.map(item => item.percentage);
         const colors = this.statusData.map(item => item.color);
+        
+        console.log('Status Manager - Chart data prepared:', { labels, data, colors });
 
         this.statusChart = new Chart(ctx, {
             type: 'doughnut',
@@ -216,6 +264,8 @@ class StatusManager {
                 cutout: '50%'
             }
         });
+        
+        console.log('Status Manager - Chart created successfully:', !!this.statusChart);
     }
 
     renderTimeline() {
@@ -296,7 +346,20 @@ class StatusManager {
     getTimeRange(isLiveMode) {
         const cockpit = this.app.cockpitManager;
         const now = new Date();
-        const config = cockpit.getConfig();
+        
+        // Fallback config if cockpit manager is not available
+        let config = {
+            liveRange: 3600,    // 1 hour
+            historyRange: 86400 // 24 hours
+        };
+        
+        try {
+            if (cockpit && cockpit.getConfig) {
+                config = cockpit.getConfig();
+            }
+        } catch (error) {
+            console.warn('Status Manager - Using fallback config:', error);
+        }
         
         if (isLiveMode) {
             return {
@@ -341,15 +404,57 @@ class StatusManager {
     }
 
     hideStatusLoading() {
-        // Restore chart canvas
+        // Restore chart canvas - always restore if loading content is present
         const chartContainer = document.getElementById('statusChart')?.parentElement;
+        console.log('Status Manager - Chart container found:', !!chartContainer);
+        
         if (chartContainer) {
-            chartContainer.innerHTML = `
-                <h3 class="text-lg font-semibold mb-4">Status Distribution</h3>
-                <div class="h-48">
-                    <canvas id="statusChart"></canvas>
-                </div>
-            `;
+            console.log('Status Manager - Current container HTML:', chartContainer.innerHTML);
+            
+            const hasLoadingContent = chartContainer.innerHTML.includes('Loading status data') || 
+                                    chartContainer.innerHTML.includes('spinner') ||
+                                    !document.getElementById('statusChart');
+            
+            console.log('Status Manager - Has loading content:', hasLoadingContent);
+            
+            if (hasLoadingContent) {
+                console.log('Status Manager - Restoring chart canvas (found loading content)');
+                chartContainer.innerHTML = `<canvas id="statusChart"></canvas>`;
+                console.log('Status Manager - After restoration, canvas exists:', !!document.getElementById('statusChart'));
+            }
+        } else {
+            // If we can't find parent, try to find by class or other means
+            console.log('Status Manager - Looking for chart container by other means...');
+            const containers = document.querySelectorAll('.bg-white.rounded-lg.shadow.p-4');
+            console.log('Status Manager - Found', containers.length, 'potential containers');
+            
+            // Look for the one that should contain the status chart
+            for (let container of containers) {
+                if (container.innerHTML.includes('Loading status data') || 
+                    container.innerHTML.includes('Status Distribution')) {
+                    console.log('Status Manager - Found status container, restoring canvas');
+                    container.innerHTML = `
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold">Status Distribution</h3>
+                            <button id="exportStatusBtn"
+                              class="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                              Export Data
+                            </button>
+                        </div>
+                        <div class="h-48">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    `;
+                    break;
+                }
+            }
+        }
+        
+        // Restore timeline container if it contains loading message
+        const timelineContainer = document.getElementById('statusTimeline');
+        if (timelineContainer && timelineContainer.innerHTML.includes('Loading timeline')) {
+            console.log('Status Manager - Restoring timeline container');
+            timelineContainer.innerHTML = '<!-- Timeline items will be populated here -->';
         }
     }
 

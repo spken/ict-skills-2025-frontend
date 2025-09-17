@@ -167,7 +167,7 @@ class CockpitManager {
             }
 
             if (gps.status === 'fulfilled') {
-                this.updateGpsPosition(gps.value.latitude, gps.value.longitude, gps.value.timestamp);
+                await this.updateGpsPosition(gps.value.latitude, gps.value.longitude, gps.value.timestamp);
             }
 
             // Generate initial status message
@@ -190,10 +190,10 @@ class CockpitManager {
         this.app.updateLastUpdateTime();
     }
 
-    handleGpsUpdate(data) {
+    async handleGpsUpdate(data) {
         if (!this.currentDevice || data.LawnmowerId !== this.currentDevice.id) return;
         
-        this.updateGpsPosition(data.Latitude, data.Longitude, new Date());
+        await this.updateGpsPosition(data.Latitude, data.Longitude, new Date());
         this.checkStuckDetection(data.Latitude, data.Longitude);
         this.app.updateLastUpdateTime();
     }
@@ -247,10 +247,10 @@ class CockpitManager {
         }
     }
 
-    updateGpsPosition(latitude, longitude, timestamp) {
+    async updateGpsPosition(latitude, longitude, timestamp) {
         // Update map if visible
         if (this.app.currentTab === 'map' && this.app.mapManager) {
-            this.app.mapManager.updatePosition(latitude, longitude, timestamp);
+            await this.app.mapManager.updatePosition(latitude, longitude, timestamp);
         }
 
         // Store latest position for stuck detection
@@ -466,7 +466,7 @@ class CockpitManager {
             }
 
             if (gps.status === 'fulfilled') {
-                this.handleGpsUpdate({
+                await this.handleGpsUpdate({
                     LawnmowerId: this.currentDevice.id,
                     Latitude: gps.value.latitude,
                     Longitude: gps.value.longitude
