@@ -87,6 +87,12 @@ class ChartManager {
         const canvas = document.getElementById('batteryChart');
         if (!canvas) return;
 
+        // Destroy existing chart if it exists
+        if (this.batteryChart) {
+            this.batteryChart.destroy();
+            this.batteryChart = null;
+        }
+
         const ctx = canvas.getContext('2d');
 
         // Prepare data
