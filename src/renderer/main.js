@@ -362,16 +362,24 @@ class LawnmowerApp {
     }
 
     async initializeMap() {
+        // Show loading if map isn't initialized yet
         if (!this.mapManager.isInitialized) {
-            await this.mapManager.initialize();
+            this.mapManager.showMapLoading();
         }
         
-        // Resize map to ensure proper display
-        this.mapManager.resize();
-        
-        // Load device data if device is selected
-        if (this.currentDevice) {
-            this.mapManager.setDevice(this.currentDevice);
+        try {
+            await this.mapManager.initialize();
+            
+            // Resize map to ensure proper display
+            this.mapManager.resize();
+            
+            // Load device data if device is selected
+            if (this.currentDevice) {
+                this.mapManager.setDevice(this.currentDevice);
+            }
+        } catch (error) {
+            console.error('Failed to initialize map:', error);
+            this.mapManager.showMapError('Failed to load map');
         }
     }
 

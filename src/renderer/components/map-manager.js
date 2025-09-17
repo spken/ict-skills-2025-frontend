@@ -18,17 +18,23 @@ class MapManager {
     async initialize() {
         if (this.isInitialized) return;
 
+        // Show loading indicator (non-blocking)
+        this.showMapLoading();
+
         try {
-            // Initialize Leaflet map
+            // Initialize Leaflet map immediately without waiting for tiles
             this.map = L.map('mapContainer', {
                 zoomControl: true,
                 attributionControl: false
             }).setView([47.3769, 8.5417], 13); // Default to Zurich
 
             // Add OpenStreetMap tiles
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
-            }).addTo(this.map);
+            });
+
+            // Add tiles to map immediately
+            tileLayer.addTo(this.map);
 
             // Initialize path layer group
             this.pathLayer = L.layerGroup().addTo(this.map);
@@ -37,10 +43,17 @@ class MapManager {
             this.addMapControls();
 
             this.isInitialized = true;
+            this.hideMapLoading();
             console.log('Map initialized successfully');
+
+            // Optional: Hide loading after tiles load (but don't block initialization)
+            tileLayer.on('load', () => {
+                this.hideMapLoading();
+            });
 
         } catch (error) {
             console.error('Failed to initialize map:', error);
+            this.hideMapLoading();
             this.showMapError('Failed to initialize map');
         }
     }
@@ -109,7 +122,7 @@ class MapManager {
         this.clearPath();
         this.clearStuckMarkers();
 
-        if (device) {
+        if (device && this.isInitialized) {
             this.loadDeviceHistory();
         }
     }
@@ -118,6 +131,11 @@ class MapManager {
         if (!this.currentDevice) return;
 
         try {
+            // Show loading overlay (only if map is initialized)
+            if (this.isInitialized) {
+                this.showMapLoading();
+            }
+
             // Load GPS history for the current time range
             const timeRange = this.getTimeRange();
             const history = await window.lawnmowerAPI.getGpsHistory(
@@ -134,15 +152,131 @@ class MapManager {
 
             this.renderPath();
 
-            // Center map on latest position if available
-            if (this.pathPoints.length > 0) {
+            // If no GPS history, try to get current position
+            if (this.pathPoints.length === 0) {
+                try {
+                    const currentGps = await window.lawnmowerAPI.getCurrentGps(this.currentDevice.id);
+                    if (currentGps) {
+                        this.updatePosition(currentGps.latitude, currentGps.longitude, new Date(currentGps.timestamp));
+                    } else {
+                        // No GPS data available - show placeholder
+                        this.showNoGpsData();
+                    }
+                } catch (error) {
+                    console.log('No current GPS data available');
+                    this.showNoGpsData();
+                }
+            } else {
+                // Center map on latest position
                 const latest = this.pathPoints[this.pathPoints.length - 1];
                 this.updatePosition(latest.lat, latest.lng, latest.timestamp);
+                this.map.setView([latest.lat, latest.lng], 16);
             }
 
         } catch (error) {
             console.error('Failed to load device GPS history:', error);
+            this.showNoGpsData();
+        } finally {
+            // Always hide loading overlay
+            if (this.isInitialized) {
+                this.hideMapLoading();
+            }
         }
+    }
+
+    showMapLoading() {
+        const container = document.getElementById('mapContainer');
+        
+        // Create loading overlay that doesn't replace the map container content
+        let loadingOverlay = container.querySelector('.loading-overlay');
+        if (!loadingOverlay) {
+            loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                backdrop-filter: blur(2px);
+            `;
+            
+            loadingOverlay.innerHTML = `
+                <div class="flex items-center">
+                    <div class="spinner" style="
+                        width: 20px;
+                        height: 20px;
+                        border: 2px solid #e5e7eb;
+                        border-top: 2px solid #059669;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                        margin-right: 8px;
+                    "></div>
+                    <span class="loading-text" style="color: #374151; font-size: 14px;">Loading map...</span>
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+            
+            // Ensure container has relative positioning
+            if (container.style.position !== 'relative' && container.style.position !== 'absolute') {
+                container.style.position = 'relative';
+            }
+            
+            container.appendChild(loadingOverlay);
+        }
+    }
+
+    hideMapLoading() {
+        const container = document.getElementById('mapContainer');
+        const loadingOverlay = container.querySelector('.loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.remove();
+        }
+    }
+
+    showNoGpsData() {
+        if (!this.isInitialized) return;
+
+        // Show message overlay on map
+        const noDataOverlay = L.control({ position: 'topleft' });
+        noDataOverlay.onAdd = () => {
+            const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control no-gps-overlay');
+            div.innerHTML = `
+                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 m-2 max-w-xs">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="text-sm">
+                            <p class="font-medium text-yellow-800">No GPS data available</p>
+                            <p class="text-yellow-700">Device location will appear here when GPS data is received</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return div;
+        };
+        
+        noDataOverlay.addTo(this.map);
+
+        // Remove overlay after 5 seconds
+        setTimeout(() => {
+            try {
+                this.map.removeControl(noDataOverlay);
+            } catch (e) {
+                // Control might have been removed already
+            }
+        }, 5000);
     }
 
     getTimeRange() {
@@ -190,6 +324,11 @@ class MapManager {
 
             this.renderPath();
         }
+
+        // Auto-center on first position update
+        if (this.pathPoints.length === 1) {
+            this.map.setView(position, 16);
+        }
     }
 
     createDeviceMarker(latitude, longitude) {
@@ -200,7 +339,7 @@ class MapManager {
             <div class="device-marker">
                 <div class="device-marker-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#228B22">
-                        <path d="M12 2L13.09 6.26L18 7L13.09 7.74L12 12L10.91 7.74L6 7L10.91 6.26L12 2M4 14H8V18H4V14M16 14H20V18H16V14Z"/>
+                        <path d="M12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5M12,2A7,7 0 0,1 19,9C19,14.25 12,22 12,22C12,22 5,14.25 5,9A7,7 0 0,1 12,2M12,4A5,5 0 0,0 7,9C7,13 12,19.16 12,19.16C12,19.16 17,13 17,9A5,5 0 0,0 12,4Z"/>
                     </svg>
                 </div>
                 <div class="device-marker-pulse"></div>
@@ -218,8 +357,8 @@ class MapManager {
             .bindPopup(() => {
                 return `
                     <div class="device-popup">
-                        <h4 class="font-semibold">${this.currentDevice.name}</h4>
-                        <p class="text-sm text-gray-600">${this.currentDevice.address}</p>
+                        <h4 class="font-semibold">${this.currentDevice ? this.currentDevice.name : 'Device'}</h4>
+                        <p class="text-sm text-gray-600">${this.currentDevice ? this.currentDevice.address : 'Unknown address'}</p>
                         <p class="text-xs text-gray-500 mt-2">
                             Current Position:<br>
                             ${latitude.toFixed(6)}, ${longitude.toFixed(6)}
@@ -228,6 +367,8 @@ class MapManager {
                 `;
             })
             .addTo(this.map);
+
+        console.log('Device marker created at:', latitude, longitude);
     }
 
     renderPath() {
@@ -318,11 +459,14 @@ class MapManager {
         const container = document.getElementById('mapContainer');
         container.innerHTML = `
             <div class="flex items-center justify-center h-full bg-gray-100">
-                <div class="text-center">
-                    <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="text-center max-w-md p-6">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3"></path>
                     </svg>
-                    <p class="text-gray-600">${message}</p>
+                    <p class="text-gray-600 mb-4">${message}</p>
+                    <button onclick="window.lawnmowerApp.initializeMap()" class="px-4 py-2 bg-greenbot text-white rounded hover:bg-forest transition-colors">
+                        Retry
+                    </button>
                 </div>
             </div>
         `;

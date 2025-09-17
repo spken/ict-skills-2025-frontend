@@ -523,17 +523,41 @@ button:disabled {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
+    z-index: 1000;
+    border-radius: 8px;
 }
 
 .loading-text {
     margin-left: 12px;
     color: #6b7280;
     font-size: 14px;
+    font-weight: 500;
+}
+
+/* No GPS data overlay */
+.no-gps-overlay {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.no-gps-overlay > div {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* Real-time data indicators */
