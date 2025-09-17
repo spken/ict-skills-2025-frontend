@@ -22,6 +22,23 @@ class MapManager {
         this.showMapLoading();
 
         try {
+            // Ensure container has proper dimensions before initializing map
+            const container = document.getElementById('mapContainer');
+            if (!container) {
+                throw new Error('Map container not found');
+            }
+
+            // Force container to have dimensions if needed
+            if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+                container.style.width = '100%';
+                container.style.height = '400px';
+                container.style.minHeight = '300px';
+            }
+
+            // Ensure container is properly sized and visible
+            container.style.position = 'relative';
+            container.style.zIndex = '1';
+
             // Initialize Leaflet map immediately without waiting for tiles
             this.map = L.map('mapContainer', {
                 zoomControl: true,
@@ -41,6 +58,23 @@ class MapManager {
 
             // Add custom controls
             this.addMapControls();
+
+            // Set up window resize listener
+            this.setupResizeListener();
+
+            // Force map to recalculate its size after initialization
+            setTimeout(() => {
+                if (this.map) {
+                    this.map.invalidateSize(true); // Use true to force reset
+                }
+            }, 100);
+
+            // Also invalidate size after a longer delay to handle any remaining layout issues
+            setTimeout(() => {
+                if (this.map) {
+                    this.map.invalidateSize(true);
+                }
+            }, 500);
 
             this.isInitialized = true;
             this.hideMapLoading();
@@ -472,17 +506,74 @@ class MapManager {
         `;
     }
 
+    setupResizeListener() {
+        // Set up window resize listener for map
+        this.resizeListener = () => {
+            if (this.map) {
+                setTimeout(() => {
+                    this.map.invalidateSize(true);
+                }, 100);
+            }
+        };
+        
+        window.addEventListener('resize', this.resizeListener);
+        
+        // Also listen for tab changes or container visibility changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const mapTab = document.getElementById('mapTab');
+                    if (mapTab && !mapTab.classList.contains('hidden') && this.map) {
+                        setTimeout(() => {
+                            this.map.invalidateSize(true);
+                        }, 50);
+                    }
+                }
+            });
+        });
+        
+        const mapTab = document.getElementById('mapTab');
+        if (mapTab) {
+            observer.observe(mapTab, { attributes: true, attributeFilter: ['class'] });
+        }
+        
+        this.resizeObserver = observer;
+    }
     // Resize map when container is resized
     resize() {
         if (this.map) {
+            console.log('Resizing map...');
+            
+            // Force multiple invalidateSize calls to handle stubborn layout issues
+            this.map.invalidateSize(true);
+            
+            // Additional resize attempts with delays
             setTimeout(() => {
-                this.map.invalidateSize();
-            }, 100);
+                if (this.map) {
+                    this.map.invalidateSize(true);
+                }
+            }, 50);
+            
+            setTimeout(() => {
+                if (this.map) {
+                    this.map.invalidateSize(true);
+                    console.log('Map resized');
+                }
+            }, 200);
         }
     }
 
     // Cleanup
     destroy() {
+        // Remove event listeners
+        if (this.resizeListener) {
+            window.removeEventListener('resize', this.resizeListener);
+        }
+        
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
+        
         if (this.map) {
             this.map.remove();
             this.map = null;

@@ -31,6 +31,9 @@ class LawnmowerApp {
             // Initialize cockpit and map
             await this.cockpitManager.initialize();
             
+            // Initialize the map right away since it's the default tab
+            await this.initializeMap();
+            
             // Initialize event listeners
             this.setupEventListeners();
             
@@ -338,6 +341,17 @@ class LawnmowerApp {
         document.getElementById(`${tabName}Tab`).classList.remove('hidden');
         this.currentTab = tabName;
 
+        // Handle map resizing when switching to map tab
+        if (tabName === 'map' && this.mapManager && this.mapManager.isInitialized) {
+            // Immediate resize
+            this.mapManager.resize();
+            
+            // Additional resize with delay to handle layout changes
+            setTimeout(() => {
+                this.mapManager.resize();
+            }, 100);
+        }
+
         // Initialize tab-specific content
         if (this.currentDevice) {
             this.loadTabContent(tabName);
@@ -362,21 +376,31 @@ class LawnmowerApp {
     }
 
     async initializeMap() {
-        // Show loading if map isn't initialized yet
-        if (!this.mapManager.isInitialized) {
-            this.mapManager.showMapLoading();
+        // Skip if already initialized
+        if (this.mapManager.isInitialized) {
+            // Just ensure proper sizing and device data
+            this.mapManager.resize();
+            if (this.currentDevice) {
+                this.mapManager.setDevice(this.currentDevice);
+            }
+            return;
         }
         
         try {
+            console.log('Initializing map for the first time...');
             await this.mapManager.initialize();
             
-            // Resize map to ensure proper display
-            this.mapManager.resize();
+            // Resize map to ensure proper display after initialization
+            setTimeout(() => {
+                this.mapManager.resize();
+            }, 100);
             
             // Load device data if device is selected
             if (this.currentDevice) {
                 this.mapManager.setDevice(this.currentDevice);
             }
+            
+            console.log('Map initialized successfully');
         } catch (error) {
             console.error('Failed to initialize map:', error);
             this.mapManager.showMapError('Failed to load map');
