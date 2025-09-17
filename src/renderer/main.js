@@ -13,16 +13,23 @@ class LawnmowerApp {
         this.currentTab = 'map';
         this.isInitialized = false;
         
-        // Initialize device manager
+        // Initialize managers
         this.deviceManager = null;
+        this.cockpitManager = null;
+        this.mapManager = null;
     }
 
     async initialize() {
         try {
             console.log('Initializing Lawnmower App...');
             
-            // Initialize device manager
+            // Initialize managers
             this.deviceManager = new window.DeviceManager(this);
+            this.cockpitManager = new window.CockpitManager(this);
+            this.mapManager = new window.MapManager(this);
+            
+            // Initialize cockpit and map
+            await this.cockpitManager.initialize();
             
             // Initialize event listeners
             this.setupEventListeners();
@@ -84,27 +91,17 @@ class LawnmowerApp {
     setupRealTimeHandlers() {
         // Battery measurements
         window.lawnmowerAPI.onMeasurement('battery', (data) => {
-            if (this.currentDevice && data.LawnmowerId === this.currentDevice.id) {
-                this.updateBatteryLevel(data.BatteryLevel);
-                this.updateLastUpdateTime();
-            }
+            this.cockpitManager.handleBatteryUpdate(data);
         });
 
         // GPS measurements
         window.lawnmowerAPI.onMeasurement('gps', (data) => {
-            if (this.currentDevice && data.LawnmowerId === this.currentDevice.id) {
-                this.updateGpsPosition(data.Latitude, data.Longitude);
-                this.updateLastUpdateTime();
-            }
+            this.cockpitManager.handleGpsUpdate(data);
         });
 
         // State measurements
         window.lawnmowerAPI.onMeasurement('state', (data) => {
-            if (this.currentDevice && data.LawnmowerId === this.currentDevice.id) {
-                this.updateDeviceState(data.State);
-                this.updateLastUpdateTime();
-                this.generateStateChangeMessage(data.State);
-            }
+            this.cockpitManager.handleStateUpdate(data);
         });
     }
 
@@ -142,26 +139,21 @@ class LawnmowerApp {
     async selectDevice(deviceId) {
         if (!deviceId) {
             this.currentDevice = null;
+            await this.cockpitManager.setDevice(null);
             this.showNoDeviceState();
             this.updateActionButtons();
             return;
         }
 
         try {
-            // Unsubscribe from previous device
-            if (this.currentDevice) {
-                await window.lawnmowerAPI.unsubscribeFromLawnmower(this.currentDevice.id);
-            }
-
             // Find and set current device
             this.currentDevice = this.lawnmowers.find(m => m.id == deviceId);
             if (!this.currentDevice) return;
 
-            // Subscribe to real-time updates
-            await window.lawnmowerAPI.subscribeToLawnmower(this.currentDevice.id);
+            // Set device in cockpit manager (handles SignalR subscription)
+            await this.cockpitManager.setDevice(this.currentDevice);
 
-            // Load device data and show cockpit
-            await this.loadDeviceData();
+            // Show cockpit view
             this.showCockpitView();
             this.updateActionButtons();
 
@@ -289,8 +281,15 @@ class LawnmowerApp {
         
         // Set new stale data timeout (1 minute)
         this.staleDataTimeout = setTimeout(() => {
-            this.showStaleDataBanner();
+            if (this.cockpitManager) {
+                this.cockpitManager.onStaleData();
+            }
         }, 60000);
+        
+        // Hide stale data banner if visible
+        if (this.cockpitManager) {
+            this.cockpitManager.onFreshData();
+        }
     }
 
     updateConnectionStatus(connected) {
@@ -348,7 +347,7 @@ class LawnmowerApp {
     async loadTabContent(tabName) {
         switch (tabName) {
             case 'map':
-                this.initializeMap();
+                await this.initializeMap();
                 break;
             case 'battery':
                 this.loadBatteryChart();
@@ -362,10 +361,18 @@ class LawnmowerApp {
         }
     }
 
-    // Placeholder methods for tab content - to be implemented in future milestones
-    initializeMap() {
-        console.log('Initializing map...');
-        // Map initialization will be implemented in the visualization milestone
+    async initializeMap() {
+        if (!this.mapManager.isInitialized) {
+            await this.mapManager.initialize();
+        }
+        
+        // Resize map to ensure proper display
+        this.mapManager.resize();
+        
+        // Load device data if device is selected
+        if (this.currentDevice) {
+            this.mapManager.setDevice(this.currentDevice);
+        }
     }
 
     loadBatteryChart() {
@@ -379,8 +386,9 @@ class LawnmowerApp {
     }
 
     loadMessages() {
-        console.log('Loading messages...');
-        // Message loading will be implemented in the visualization milestone
+        if (this.cockpitManager) {
+            this.cockpitManager.renderMessages();
+        }
     }
 
     // Message system
@@ -423,8 +431,9 @@ class LawnmowerApp {
     }
 
     changeTimeRange(range) {
-        console.log('Time range changed to:', range);
-        // Time range logic will be implemented in the visualization milestone
+        if (this.cockpitManager) {
+            this.cockpitManager.changeTimeRange(range === 'live');
+        }
     }
 
     // Toast notification system

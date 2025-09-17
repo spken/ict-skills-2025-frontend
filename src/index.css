@@ -389,6 +389,213 @@ button:disabled {
     }
 }
 
+/* Map-specific styling */
+.leaflet-container {
+    border-radius: 8px;
+}
+
+.custom-device-marker,
+.custom-stuck-marker {
+    background: transparent;
+    border: none;
+}
+
+.device-marker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.device-marker-icon {
+    background: white;
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.device-marker-pulse {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #228B22;
+    opacity: 0.3;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(0.5);
+        opacity: 0.7;
+    }
+}
+
+.stuck-marker {
+    background: white;
+    border-radius: 50%;
+    padding: 2px;
+    box-shadow: 0 2px 6px rgba(244, 51, 51, 0.4);
+    animation: shake 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes shake {
+    0% { transform: translateX(-1px); }
+    100% { transform: translateX(1px); }
+}
+
+.device-popup {
+    min-width: 200px;
+}
+
+/* Stale data banner */
+.stale-data-banner {
+    background: linear-gradient(90deg, #FF7979, #F43333);
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Real-time status indicators */
+.connection-status-pulse {
+    animation: connectionPulse 2s ease-in-out infinite;
+}
+
+@keyframes connectionPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Message styling enhancements */
+.message-item {
+    border-left-width: 4px;
+    padding-left: 12px;
+    transition: background-color 0.2s;
+}
+
+.message-item:hover {
+    background-color: rgba(127, 143, 61, 0.05);
+}
+
+.message-info {
+    border-color: #7F8F3D;
+    background-color: rgba(127, 143, 61, 0.05);
+}
+
+.message-warning {
+    border-color: #FF7979;
+    background-color: rgba(255, 121, 121, 0.05);
+}
+
+.message-error {
+    border-color: #F43333;
+    background-color: rgba(244, 51, 51, 0.05);
+}
+
+/* Enhanced loading states */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.loading-text {
+    margin-left: 12px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Real-time data indicators */
+.data-fresh {
+    color: #228B22;
+}
+
+.data-stale {
+    color: #FF7979;
+}
+
+.data-error {
+    color: #F43333;
+}
+
+/* Tab content animations */
+.tab-content {
+    animation: fadeInTab 0.2s ease-in;
+}
+
+@keyframes fadeInTab {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Device status blinking for error states */
+.status-error {
+    animation: blink 1s ease-in-out infinite alternate;
+}
+
+@keyframes blink {
+    from { opacity: 1; }
+    to { opacity: 0.5; }
+}
+
+/* Custom leaflet control styling */
+.leaflet-control-custom {
+    background: white;
+    border: 2px solid rgba(0,0,0,0.2);
+    background-clip: padding-box;
+}
+
+.leaflet-control-custom:hover {
+    background: #f8f9fa;
+}
+
+/* Tooltip styling */
+.leaflet-tooltip {
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
 /* Loading spinner */
 .spinner {
     border: 3px solid #f3f3f3;
