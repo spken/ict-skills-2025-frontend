@@ -892,3 +892,48 @@ button:disabled {
     font-size: 14px;
     font-weight: 500;
 }
+
+/* Import/Export specific styling */
+.import-table th {
+    background: #f8fafc;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.progress-container {
+    transition: all 0.3s ease;
+}
+
+.file-drop-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.file-drop-zone:hover {
+    border-color: #7F8F3D;
+    background: rgba(127, 143, 61, 0.05);
+}
+
+.file-drop-zone.drag-over {
+    border-color: #228B22;
+    background: rgba(34, 139, 34, 0.1);
+}
+
+.export-preview {
+    background: linear-gradient(135deg, #f0f9f4, #e6fffa);
+    border-left: 4px solid #228B22;
+}
