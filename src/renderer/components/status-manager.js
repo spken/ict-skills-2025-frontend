@@ -300,43 +300,49 @@ class StatusManager {
     }
 
     showStatusLoading() {
-        const chartContainer = document.getElementById('statusChart').parentElement;
+        const chartContainer = document.getElementById('statusChart')?.parentElement;
         const timelineContainer = document.getElementById('statusTimeline');
         
         // Show loading in chart area
-        chartContainer.innerHTML = `
-            <div class="flex items-center justify-center h-48">
-                <div class="flex items-center">
-                    <div class="spinner"></div>
-                    <span class="loading-text">Loading status data...</span>
+        if (chartContainer) {
+            chartContainer.innerHTML = `
+                <div class="flex items-center justify-center h-48">
+                    <div class="flex items-center">
+                        <div class="spinner"></div>
+                        <span class="loading-text">Loading status data...</span>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
 
         // Show loading in timeline area
-        timelineContainer.innerHTML = `
-            <div class="flex items-center justify-center h-48">
-                <div class="flex items-center">
-                    <div class="spinner"></div>
-                    <span class="loading-text">Loading timeline...</span>
+        if (timelineContainer) {
+            timelineContainer.innerHTML = `
+                <div class="flex items-center justify-center h-48">
+                    <div class="flex items-center">
+                        <div class="spinner"></div>
+                        <span class="loading-text">Loading timeline...</span>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 
     hideStatusLoading() {
         // Restore chart canvas
-        const chartContainer = document.getElementById('statusChart').parentElement;
-        chartContainer.innerHTML = `
-            <h3 class="text-lg font-semibold mb-4">Status Distribution</h3>
-            <div class="h-48">
-                <canvas id="statusChart"></canvas>
-            </div>
-        `;
+        const chartContainer = document.getElementById('statusChart')?.parentElement;
+        if (chartContainer) {
+            chartContainer.innerHTML = `
+                <h3 class="text-lg font-semibold mb-4">Status Distribution</h3>
+                <div class="h-48">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            `;
+        }
     }
 
     showNoStatusData() {
-        const chartContainer = document.getElementById('statusChart').parentElement;
+        const chartContainer = document.getElementById('statusChart')?.parentElement;
         const timelineContainer = document.getElementById('statusTimeline');
         
         const noDataHtml = `
@@ -351,16 +357,20 @@ class StatusManager {
             </div>
         `;
 
-        chartContainer.innerHTML = `
-            <h3 class="text-lg font-semibold mb-4">Status Distribution</h3>
-            ${noDataHtml}
-        `;
+        if (chartContainer) {
+            chartContainer.innerHTML = `
+                <h3 class="text-lg font-semibold mb-4">Status Distribution</h3>
+                ${noDataHtml}
+            `;
+        }
 
-        timelineContainer.innerHTML = noDataHtml;
+        if (timelineContainer) {
+            timelineContainer.innerHTML = noDataHtml;
+        }
     }
 
     showStatusError(message) {
-        const chartContainer = document.getElementById('statusChart').parentElement;
+        const chartContainer = document.getElementById('statusChart')?.parentElement;
         const timelineContainer = document.getElementById('statusTimeline');
         
         const errorHtml = `
@@ -374,12 +384,16 @@ class StatusManager {
             </div>
         `;
 
-        chartContainer.innerHTML = `
-            <h3 class="text-lg font-semibold mb-4">Status Distribution</h3>
-            ${errorHtml}
-        `;
+        if (chartContainer) {
+            chartContainer.innerHTML = `
+                <h3 class="text-lg font-semibold mb-4">Status Distribution</h3>
+                ${errorHtml}
+            `;
+        }
 
-        timelineContainer.innerHTML = errorHtml;
+        if (timelineContainer) {
+            timelineContainer.innerHTML = errorHtml;
+        }
     }
 
     // Export status data

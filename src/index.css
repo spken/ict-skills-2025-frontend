@@ -937,3 +937,74 @@ button:disabled {
     background: linear-gradient(135deg, #f0f9f4, #e6fffa);
     border-left: 4px solid #228B22;
 }
+
+/* Remote control specific styling */
+.control-button {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.control-button-enabled {
+    background: #f0f9f4;
+    border-color: #228B22;
+    box-shadow: 0 2px 6px rgba(34, 139, 34, 0.2);
+}
+
+.control-button-enabled:hover {
+    background: #e6fffa;
+    border-color: #39FF14;
+    box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
+}
+
+.control-button-disabled {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.control-button img {
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+.control-button-enabled img {
+    opacity: 1;
+}
+
+.control-button-disabled img {
+    opacity: 0.4;
+}
+
+/* Configuration table styling */
+.config-table th {
+    background: #f8fafc;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+}
+
+.config-value-badge {
+    background: linear-gradient(135deg, #7F8F3D, #228B22);
+    color: white;
+    font-weight: 500;
+}
+
+/* Connection status indicators */
+.connection-online {
+    color: #10b981;
+}
+
+.connection-offline {
+    color: #ef4444;
+}
+
+.connection-indicator {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}

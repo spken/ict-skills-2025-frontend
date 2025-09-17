@@ -340,7 +340,12 @@ class ChartManager {
     }
 
     showChartLoading(chartId) {
-        const container = document.getElementById(chartId).parentElement;
+        const chartElement = document.getElementById(chartId);
+        if (!chartElement) return;
+        
+        const container = chartElement.parentElement;
+        if (!container) return;
+        
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'chart-loading-overlay';
         loadingDiv.innerHTML = `
@@ -355,7 +360,12 @@ class ChartManager {
     }
 
     hideChartLoading(chartId) {
-        const container = document.getElementById(chartId).parentElement;
+        const chartElement = document.getElementById(chartId);
+        if (!chartElement) return;
+        
+        const container = chartElement.parentElement;
+        if (!container) return;
+        
         const loading = container.querySelector('.chart-loading-overlay');
         if (loading) {
             container.removeChild(loading);
@@ -363,7 +373,12 @@ class ChartManager {
     }
 
     showChartError(chartId, message) {
-        const container = document.getElementById(chartId).parentElement;
+        const chartElement = document.getElementById(chartId);
+        if (!chartElement) return;
+        
+        const container = chartElement.parentElement;
+        if (!container) return;
+        
         const errorDiv = document.createElement('div');
         errorDiv.className = 'chart-error-overlay';
         errorDiv.innerHTML = `

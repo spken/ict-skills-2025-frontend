@@ -420,7 +420,7 @@ class MapManager {
                 weight: 1,
                 opacity: 0.8,
                 fillOpacity: 0.6
-            }).bindTooltip(`${point.timestamp.toLocaleTimeString()}`, {
+            }).bindTooltip(`${new Date(point.timestamp).toLocaleTimeString()}`, {
                 direction: 'top',
                 offset: [0, -5]
             });

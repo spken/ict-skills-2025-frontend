@@ -20,6 +20,8 @@ class LawnmowerApp {
         this.chartManager = null;
         this.statusManager = null;
         this.importExportManager = null;
+        this.remoteControlManager = null;
+        this.configurationManager = null;
     }
 
     async initialize() {
@@ -36,6 +38,8 @@ class LawnmowerApp {
             this.chartManager = new window.ChartManager(this);
             this.statusManager = new window.StatusManager(this);
             this.importExportManager = new window.ImportExportManager(this);
+            this.remoteControlManager = new window.RemoteControlManager(this);
+            this.configurationManager = new window.ConfigurationManager(this);
 
             // Initialize components
             await this.cockpitManager.initialize();
@@ -145,6 +149,8 @@ class LawnmowerApp {
                 this.statusManager.exportStatusData();
             }
         });
+
+        document.getElementById('configBtn').addEventListener('dblclick', () => this.showConfiguration());
     }
 
     setupRealTimeHandlers() {
@@ -161,6 +167,7 @@ class LawnmowerApp {
         // State measurements
         window.lawnmowerAPI.onMeasurement('state', (data) => {
             this.cockpitManager.handleStateUpdate(data);
+            this.remoteControlManager.updateDeviceState(data.State);
         });
     }
 
@@ -215,6 +222,7 @@ class LawnmowerApp {
             await this.cockpitManager.setDevice(this.currentDevice);
             this.chartManager.setDevice(this.currentDevice);
             this.statusManager.setDevice(this.currentDevice);
+            this.remoteControlManager.setDevice(this.currentDevice);
 
             // Show cockpit view
             this.showCockpitView();
@@ -520,11 +528,11 @@ class LawnmowerApp {
     }
 
     showRemoteControlDialog() {
-        this.showToast('Remote control dialog - coming in next milestone', 'info');
+        this.remoteControlManager.showRemoteControlDialog();
     }
 
     showConfiguration() {
-        this.showToast('Configuration viewer - coming in next milestone', 'info');
+        this.configurationManager.showConfiguration();
     }
 
     async loadBatteryChart() {
@@ -572,14 +580,6 @@ class LawnmowerApp {
 
     showExportDialog() {
         this.importExportManager.showExportMowerDialog();
-    }
-
-    showRemoteControlDialog() {
-        this.showToast('Remote control dialog - coming in next milestone', 'info');
-    }
-
-    showConfiguration() {
-        this.showToast('Configuration viewer - coming in next milestone', 'info');
     }
 
     changeTimeRange(range) {
