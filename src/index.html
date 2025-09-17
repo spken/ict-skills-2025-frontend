@@ -170,40 +170,41 @@
           <!-- Main Dashboard Content -->
           <div class="flex-1 p-4 bg-gray-50 overflow-auto">
             <div class="mb-4">
-              <!-- Time Range Selector -->
-              <div class="flex items-center space-x-4 mb-4">
-                <label class="text-sm font-medium text-gray-700">Time range:</label>
-                <select id="timeRangeSelector"
-                  class="px-3 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-greenbot focus:border-greenbot">
-                  <option value="live">Latest / Live</option>
-                  <option value="history">Historic</option>
-                </select>
-              </div>
-
-              <!-- Tab Navigation -->
+              <!-- Tab Navigation with inline Time Range Selector -->
               <div class="border-b border-gray-200 mb-4">
-                <nav class="flex space-x-8">
-                  <button
-                    class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300 active"
-                    data-tab="map">
-                    Map
-                  </button>
-                  <button
-                    class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300"
-                    data-tab="battery">
-                    Battery
-                  </button>
-                  <button
-                    class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300"
-                    data-tab="status">
-                    Status
-                  </button>
-                  <button
-                    class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300"
-                    data-tab="messages">
-                    Messages
-                  </button>
-                </nav>
+                <div class="flex items-center justify-between">
+                  <nav class="flex space-x-8">
+                    <button
+                      class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300 active"
+                      data-tab="map">
+                      Map
+                    </button>
+                    <button
+                      class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300"
+                      data-tab="battery">
+                      Battery
+                    </button>
+                    <button
+                      class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300"
+                      data-tab="status">
+                      Status
+                    </button>
+                    <button
+                      class="tab-btn py-2 px-1 border-b-2 border-transparent font-medium text-sm hover:text-gray-700 hover:border-gray-300"
+                      data-tab="messages">
+                      Messages
+                    </button>
+                  </nav>
+                  <!-- Time Range Selector -->
+                  <div class="flex items-center space-x-2">
+                    <label class="text-sm font-medium text-gray-700">Time range:</label>
+                    <select id="timeRangeSelector"
+                      class="px-3 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-greenbot focus:border-greenbot text-sm">
+                      <option value="live">Latest / Live</option>
+                      <option value="history">Historic</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
 

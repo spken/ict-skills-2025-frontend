@@ -45,12 +45,12 @@ class RemoteControlManager {
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
         overlay.innerHTML = `
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-                <div class="px-6 py-4 border-b border-gray-200">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+                <div class="px-6 py-3 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900">Remote Control</h3>
                 </div>
                 
-                <div class="px-6 py-6 space-y-6">
+                <div class="px-6 py-4 space-y-4">
                     <!-- Current Status -->
                     <div class="text-center">
                         <div class="text-sm text-gray-600 mb-1">Current Status:</div>
@@ -63,57 +63,39 @@ class RemoteControlManager {
                         </div>
                     </div>
 
-                    <!-- Control Buttons -->
-                    <div class="grid grid-cols-3 gap-4">
+                    <!-- All Control Buttons in One Line -->
+                    <div class="flex justify-center space-x-6">
                         <!-- Start Button -->
-                        <div class="text-center">
-                            <button id="startBtn" class="control-button w-16 h-16 mx-auto mb-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
-                                    title="Start mowing" disabled>
-                                <img src="assets/StartButton.svg" alt="Start" class="w-full h-full">
-                            </button>
-                            <div class="text-xs text-gray-600">Start</div>
-                        </div>
+                        <button id="startBtn" class="control-button w-16 h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
+                                title="Start mowing" disabled>
+                            <img src="assets/StartButton.svg" alt="Start" class="w-full h-full">
+                        </button>
 
                         <!-- Stop Button -->
-                        <div class="text-center">
-                            <button id="stopBtn" class="control-button w-16 h-16 mx-auto mb-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
-                                    title="Stop mowing" disabled>
-                                <img src="assets/StopButton.svg" alt="Stop" class="w-full h-full">
-                            </button>
-                            <div class="text-xs text-gray-600">Stop</div>
-                        </div>
+                        <button id="stopBtn" class="control-button w-16 h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
+                                title="Stop mowing" disabled>
+                            <img src="assets/StopButton.svg" alt="Stop" class="w-full h-full">
+                        </button>
 
                         <!-- Home Button -->
-                        <div class="text-center">
-                            <button id="homeBtn" class="control-button w-16 h-16 mx-auto mb-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
-                                    title="Return to station" disabled>
-                                <img src="assets/HomeButton.svg" alt="Home" class="w-full h-full">
-                            </button>
-                            <div class="text-xs text-gray-600">Home</div>
-                        </div>
-                    </div>
+                        <button id="homeBtn" class="control-button w-16 h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
+                                title="Return to station" disabled>
+                            <img src="assets/HomeButton.svg" alt="Home" class="w-full h-full">
+                        </button>
 
-                    <!-- Additional Controls -->
-                    <div class="grid grid-cols-2 gap-4">
                         <!-- Acknowledge Error Button -->
-                        <div class="text-center">
-                            <button id="ackErrorBtn" class="control-button w-16 h-16 mx-auto mb-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
-                                    title="Acknowledge error" disabled>
-                                <img src="assets/AckErrorButton.svg" alt="Ack Error" class="w-full h-full">
-                            </button>
-                            <div class="text-xs text-gray-600">Ack Error</div>
-                        </div>
+                        <button id="ackErrorBtn" class="control-button w-16 h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95" 
+                                title="Acknowledge error" disabled>
+                            <img src="assets/AckErrorButton.svg" alt="Ack Error" class="w-full h-full">
+                        </button>
 
                         <!-- Ping Button -->
-                        <div class="text-center">
-                            <button id="pingBtn" class="control-button w-16 h-16 mx-auto mb-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95 bg-blue-50 border-blue-200" 
-                                    title="Ping device">
-                                <svg class="w-8 h-8 mx-auto text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                </svg>
-                            </button>
-                            <div class="text-xs text-gray-600">Ping</div>
-                        </div>
+                        <button id="pingBtn" class="control-button w-16 h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 active:scale-95 bg-blue-50 border-blue-200" 
+                                title="Ping device">
+                            <svg class="w-8 h-8 mx-auto text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </button>
                     </div>
 
                     <!-- Command Feedback -->
@@ -215,12 +197,17 @@ class RemoteControlManager {
 
     updateStateDisplay() {
         const statusElement = document.getElementById('remoteCurrentStatus');
-        if (statusElement && this.currentState !== null) {
-            const stateName = window.lawnmowerAPI.constructor.getStateName(this.currentState);
-            const stateClass = window.lawnmowerAPI.constructor.getStateClass(this.currentState);
-            
-            statusElement.textContent = stateName;
-            statusElement.className = `text-lg font-semibold ${stateClass}`;
+        if (statusElement) {
+            if (this.currentState !== null && this.currentState !== undefined) {
+                const stateName = window.lawnmowerAPI.constructor.getStateName(this.currentState);
+                const stateClass = window.lawnmowerAPI.constructor.getStateClass(this.currentState);
+                
+                statusElement.textContent = stateName;
+                statusElement.className = `text-lg font-semibold ${stateClass}`;
+            } else {
+                statusElement.textContent = 'Loading...';
+                statusElement.className = 'text-lg font-semibold text-gray-500';
+            }
         }
     }
 
@@ -233,7 +220,20 @@ class RemoteControlManager {
             await window.lawnmowerAPI.controlLawnmower(this.currentDevice.id, actionId);
             this.showCommandFeedback(`${actionName} command sent successfully`, 'success');
             
-            // Command was successful - update will come via real-time updates
+            // Wait a moment for the command to be processed, then refresh status
+            setTimeout(async () => {
+                try {
+                    const currentState = await window.lawnmowerAPI.getCurrentState(this.currentDevice.id);
+                    if (currentState && currentState.state !== undefined) {
+                        this.currentState = currentState.state;
+                        this.updateButtonStates();
+                        this.updateStateDisplay();
+                    }
+                } catch (error) {
+                    console.error('Failed to refresh state after command:', error);
+                }
+            }, 1000);
+            
             setTimeout(() => this.hideCommandFeedback(), 3000);
 
         } catch (error) {
