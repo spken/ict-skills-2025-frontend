@@ -17,19 +17,28 @@ class LawnmowerApp {
         this.deviceManager = null;
         this.cockpitManager = null;
         this.mapManager = null;
+        this.chartManager = null;
+        this.statusManager = null;
     }
 
     async initialize() {
         try {
             console.log('Initializing Lawnmower App...');
             
+            // Wait for all required libraries to load
+            await this.waitForDependencies();
+            
             // Initialize managers
             this.deviceManager = new window.DeviceManager(this);
             this.cockpitManager = new window.CockpitManager(this);
             this.mapManager = new window.MapManager(this);
+            this.chartManager = new window.ChartManager(this);
+            this.statusManager = new window.StatusManager(this);
             
-            // Initialize cockpit and map
+            // Initialize components
             await this.cockpitManager.initialize();
+            await this.chartManager.initialize();
+            await this.statusManager.initialize();
             
             // Initialize the map right away since it's the default tab
             await this.initializeMap();
@@ -59,8 +68,44 @@ class LawnmowerApp {
             
         } catch (error) {
             console.error('Failed to initialize application:', error);
-            this.showToast('Failed to connect to backend. Please check if the backend is running.', 'error');
+            console.error('Error details:', error.stack);
+            this.showToast(`Failed to initialize: ${error.message}`, 'error');
         }
+    }
+
+    async waitForDependencies() {
+        const dependencies = [
+            { name: 'Chart.js', check: () => typeof Chart !== 'undefined' },
+            { name: 'Leaflet', check: () => typeof L !== 'undefined' }, 
+            { name: 'SignalR', check: () => typeof signalR !== 'undefined' },
+            { name: 'LawnmowerAPI', check: () => typeof window.lawnmowerAPI !== 'undefined' }
+        ];
+
+        console.log('Waiting for dependencies to load...');
+        
+        for (const dep of dependencies) {
+            console.log(`Checking ${dep.name}...`);
+            await new Promise((resolve) => {
+                if (dep.check()) {
+                    console.log(`✓ ${dep.name} loaded`);
+                    resolve();
+                    return;
+                }
+                
+                const pollForDependency = () => {
+                    if (dep.check()) {
+                        console.log(`✓ ${dep.name} loaded`);
+                        resolve();
+                    } else {
+                        setTimeout(pollForDependency, 100);
+                    }
+                };
+                
+                pollForDependency();
+            });
+        }
+        
+        console.log('All dependencies loaded successfully');
     }
 
     setupEventListeners() {
@@ -89,6 +134,15 @@ class LawnmowerApp {
 
         // Configuration button
         document.getElementById('configBtn').addEventListener('click', () => this.showConfiguration());
+
+        // Export buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'exportBatteryBtn') {
+                this.chartManager.exportBatteryData();
+            } else if (e.target.id === 'exportStatusBtn') {
+                this.statusManager.exportStatusData();
+            }
+        });
     }
 
     setupRealTimeHandlers() {
@@ -143,6 +197,8 @@ class LawnmowerApp {
         if (!deviceId) {
             this.currentDevice = null;
             await this.cockpitManager.setDevice(null);
+            this.chartManager.setDevice(null);
+            this.statusManager.setDevice(null);
             this.showNoDeviceState();
             this.updateActionButtons();
             return;
@@ -153,12 +209,17 @@ class LawnmowerApp {
             this.currentDevice = this.lawnmowers.find(m => m.id == deviceId);
             if (!this.currentDevice) return;
 
-            // Set device in cockpit manager (handles SignalR subscription)
+            // Set device in all managers
             await this.cockpitManager.setDevice(this.currentDevice);
+            this.chartManager.setDevice(this.currentDevice);
+            this.statusManager.setDevice(this.currentDevice);
 
             // Show cockpit view
             this.showCockpitView();
             this.updateActionButtons();
+
+            // Load current tab content
+            await this.loadTabContent(this.currentTab);
 
         } catch (error) {
             console.error('Failed to select device:', error);
@@ -359,15 +420,17 @@ class LawnmowerApp {
     }
 
     async loadTabContent(tabName) {
+        if (!this.currentDevice) return;
+
         switch (tabName) {
             case 'map':
                 await this.initializeMap();
                 break;
             case 'battery':
-                this.loadBatteryChart();
+                await this.loadBatteryChart();
                 break;
             case 'status':
-                this.loadStatusChart();
+                await this.loadStatusChart();
                 break;
             case 'messages':
                 this.loadMessages();
@@ -407,14 +470,69 @@ class LawnmowerApp {
         }
     }
 
-    loadBatteryChart() {
-        console.log('Loading battery chart...');
-        // Chart loading will be implemented in the visualization milestone
+    async loadBatteryChart() {
+        const isLiveMode = this.cockpitManager.isInLiveMode();
+        await this.chartManager.loadBatteryChart(isLiveMode);
     }
 
-    loadStatusChart() {
-        console.log('Loading status chart...');
-        // Chart loading will be implemented in the visualization milestone
+    async loadStatusChart() {
+        const isLiveMode = this.cockpitManager.isInLiveMode();
+        await this.statusManager.loadStatusVisualization(isLiveMode);
+    }
+
+    loadMessages() {
+        if (this.cockpitManager) {
+            this.cockpitManager.renderMessages();
+        }
+    }
+
+    // Message system
+    addMessage(text, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        this.messageCount++;
+        document.getElementById('messageCount').textContent = this.messageCount;
+        
+        console.log(`[${type.toUpperCase()}] ${timestamp}: ${text}`);
+        // Full message UI will be implemented in the visualization milestone
+    }
+
+    // Device management methods - now implemented
+    showAddMowerDialog() {
+        this.deviceManager.showAddMowerDialog();
+    }
+
+    showEditMowerDialog() {
+        this.deviceManager.showEditMowerDialog();
+    }
+
+    showDeleteMowerDialog() {
+        this.deviceManager.showDeleteMowerDialog();
+    }
+
+    showImportDialog() {
+        this.showToast('Import dialog - coming in next milestone', 'info');
+    }
+
+    showExportDialog() {
+        this.showToast('Export dialog - coming in next milestone', 'info');
+    }
+
+    showRemoteControlDialog() {
+        this.showToast('Remote control dialog - coming in next milestone', 'info');
+    }
+
+    showConfiguration() {
+        this.showToast('Configuration viewer - coming in next milestone', 'info');
+    }
+
+    async loadBatteryChart() {
+        const isLiveMode = this.cockpitManager.isInLiveMode();
+        await this.chartManager.loadBatteryChart(isLiveMode);
+    }
+
+    async loadStatusChart() {
+        const isLiveMode = this.cockpitManager.isInLiveMode();
+        await this.statusManager.loadStatusVisualization(isLiveMode);
     }
 
     loadMessages() {

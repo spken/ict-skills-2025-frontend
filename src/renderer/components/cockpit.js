@@ -227,9 +227,9 @@ class CockpitManager {
             batteryElement.className = 'battery-normal';
         }
 
-        // Update battery chart if visible
-        if (this.app.currentTab === 'battery') {
-            this.updateBatteryChart(level, timestamp);
+        // Update battery chart if visible and chart manager is available
+        if (this.app.currentTab === 'battery' && this.app.chartManager) {
+            this.app.chartManager.updateBatteryChart(level, timestamp);
         }
     }
 

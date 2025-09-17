@@ -620,6 +620,254 @@ button:disabled {
     padding: 4px 8px;
 }
 
+/* Chart-specific styling */
+.chart-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 8px;
+}
+
+.chart-error-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.chart-tooltip {
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Timeline styling */
+.timeline-item {
+    transition: background-color 0.2s ease;
+}
+
+.timeline-item:hover {
+    background-color: rgba(127, 143, 61, 0.05);
+}
+
+.timeline-marker {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8);
+    border: 2px solid #fff;
+}
+
+/* Enhanced export button styling */
+.export-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.export-btn:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Status distribution legend styling */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 4px 0;
+    font-size: 11px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* Chart container enhancements */
+.chart-container {
+    position: relative;
+    height: 100%;
+}
+
+.chart-container canvas {
+    background: #fafafa;
+    border-radius: 4px;
+}
+
+/* Prediction box styling */
+.prediction-box {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-left: 4px solid #f59e0b;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced status indicators */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.status-indicator.charging {
+    background: rgba(57, 255, 20, 0.2);
+    color: #166534;
+}
+
+.status-indicator.mowing {
+    background: rgba(127, 143, 61, 0.2);
+    color: #365314;
+}
+
+.status-indicator.error {
+    background: rgba(244, 51, 51, 0.2);
+    color: #991b1b;
+}
+
+.status-indicator.paused {
+    background: rgba(255, 121, 121, 0.2);
+    color: #dc2626;
+}
+
+.status-indicator.returning {
+    background: rgba(255, 121, 121, 0.2);
+    color: #ea580c;
+}
+
+/* Data visualization animations */
+.chart-fade-in {
+    animation: chartFadeIn 0.6s ease-out;
+}
+
+@keyframes chartFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Interactive chart elements */
+.chart-interactive {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.chart-interactive:hover {
+    transform: scale(1.02);
+}
+
+/* Enhanced scrollbar for timeline */
+.timeline-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.timeline-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Message list enhancements */
+.message-list-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.message-item {
+    border-left-width: 4px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.message-item:last-child {
+    border-bottom: none;
+}
+
+.message-item:hover {
+    background: rgba(127, 143, 61, 0.03);
+    transform: translateX(2px);
+}
+
+.message-timestamp {
+    opacity: 0.7;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+/* Chart responsive behavior */
+@media (max-width: 1024px) {
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+}
+
+@media (max-width: 640px) {
+    .timeline-item {
+        padding: 8px 12px;
+    }
+    
+    .timeline-marker {
+        width: 8px;
+        height: 8px;
+        margin-right: 8px;
+    }
+    
+    .export-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
 /* Loading spinner */
 .spinner {
     border: 3px solid #f3f3f3;
