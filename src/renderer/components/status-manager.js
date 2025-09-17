@@ -47,6 +47,12 @@ class StatusManager {
     async loadStatusVisualization(isLiveMode = true) {
         if (!this.currentDevice) return;
 
+        // Clean up existing chart to prevent canvas reuse errors
+        if (this.statusChart) {
+            this.statusChart.destroy();
+            this.statusChart = null;
+        }
+
         try {
             // Show loading
             this.showStatusLoading();
@@ -137,6 +143,12 @@ class StatusManager {
     async renderStatusChart() {
         const canvas = document.getElementById('statusChart');
         if (!canvas || this.statusData.length === 0) return;
+
+        // Destroy existing chart if it exists
+        if (this.statusChart) {
+            this.statusChart.destroy();
+            this.statusChart = null;
+        }
 
         const ctx = canvas.getContext('2d');
 

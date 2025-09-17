@@ -56,6 +56,12 @@ class ChartManager {
 
         this.isLiveMode = isLiveMode;
 
+        // Clean up existing chart to prevent canvas reuse errors
+        if (this.batteryChart) {
+            this.batteryChart.destroy();
+            this.batteryChart = null;
+        }
+
         try {
             // Show loading
             this.showChartLoading('batteryChart');
