@@ -86,6 +86,8 @@ class ChartManager {
         } catch (error) {
             console.error('Failed to load battery chart:', error);
             this.showChartError('batteryChart', 'Failed to load battery data');
+        } finally {
+            this.hideChartLoading('batteryChart');
         }
     }
 
@@ -101,9 +103,11 @@ class ChartManager {
 
         const ctx = canvas.getContext('2d');
 
-        // Prepare data
-        const labels = this.batteryData.map(item => item.timestamp);
-        const data = this.batteryData.map(item => item.level);
+        // Prepare data for time series chart
+        const chartData = this.batteryData.map(item => ({
+            x: item.timestamp,
+            y: item.level
+        }));
 
         // Calculate prediction if in live mode
         let predictionData = [];
@@ -121,11 +125,10 @@ class ChartManager {
         this.batteryChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
                 datasets: [
                     {
                         label: 'Battery Level',
-                        data: data,
+                        data: chartData,
                         borderColor: '#228B22',
                         backgroundColor: 'rgba(34, 139, 34, 0.1)',
                         borderWidth: 2,
@@ -168,7 +171,7 @@ class ChartManager {
                     tooltip: {
                         callbacks: {
                             title: (context) => {
-                                const date = new Date(context[0].label);
+                                const date = new Date(context[0].parsed.x);
                                 return date.toLocaleString();
                             },
                             label: (context) => {
