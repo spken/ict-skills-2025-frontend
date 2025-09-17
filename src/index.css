@@ -164,6 +164,229 @@ button:disabled {
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-overlay > div {
+    animation: slideIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: scale(0.9) translateY(-10px);
+    }
+    to { 
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Form styling enhancements */
+.modal-overlay input[type="text"]:focus,
+.modal-overlay input[type="email"]:focus,
+.modal-overlay input[type="password"]:focus,
+.modal-overlay textarea:focus,
+.modal-overlay select:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #7F8F3D;
+    border-color: #7F8F3D;
+}
+
+.modal-overlay input:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+/* Avatar preview styling */
+#avatarPreview {
+    border-style: dashed;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+#avatarPreview:hover {
+    border-color: #7F8F3D;
+    background-color: #f8f9fa;
+}
+
+/* Error state styling */
+.form-error {
+    border-color: #ef4444 !important;
+    ring-color: #ef4444 !important;
+}
+
+/* Success state styling */
+.form-success {
+    border-color: #10b981 !important;
+    ring-color: #10b981 !important;
+}
+
+/* Loading button states */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Enhanced validation styling */
+.field-error {
+    border-color: #F43333;
+    background-color: #fef2f2;
+}
+
+.field-error:focus {
+    ring-color: #F43333;
+    border-color: #F43333;
+}
+
+/* Improved toast positioning and styling */
+.toast {
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-left: 4px solid;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-success {
+    background-color: #228B22;
+    color: white;
+    border-left-color: #39FF14;
+}
+
+.toast-error {
+    background-color: #F43333;
+    color: white;
+    border-left-color: #B22222;
+}
+
+.toast-warning {
+    background-color: #FF7979;
+    color: white;
+    border-left-color: #F43333;
+}
+
+.toast-info {
+    background-color: #7F8F3D;
+    color: white;
+    border-left-color: #228B22;
+}
+
+/* Device selector with avatar preview */
+.device-option {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+}
+
+.device-option img {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    margin-right: 8px;
+    object-fit: cover;
+}
+
+/* Enhanced device status indicators */
+.device-status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.device-status-online {
+    background-color: #228B22;
+    box-shadow: 0 0 4px rgba(34, 139, 34, 0.4);
+}
+
+.device-status-offline {
+    background-color: #F43333;
+}
+
+.device-status-warning {
+    background-color: #FF7979;
+}
+
+/* Progress indicators */
+.progress-bar {
+    height: 4px;
+    background-color: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #7F8F3D;
+    transition: width 0.3s ease;
+}
+
+/* File upload drag and drop styling */
+.file-upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.file-upload-area:hover {
+    border-color: #7F8F3D;
+    background-color: #f8f9fa;
+}
+
+.file-upload-area.drag-over {
+    border-color: #7F8F3D;
+    background-color: #f0f9f4;
+}
+
+/* Confirmation dialog specific styling */
+.confirmation-dialog .warning-icon {
+    color: #f59e0b;
+}
+
+.confirmation-dialog .danger-icon {
+    color: #ef4444;
+}
+
+/* Enhanced button states */
+.btn-loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive modal sizing */
+@media (max-width: 640px) {
+    .modal-overlay > div {
+        max-width: calc(100vw - 32px);
+        margin: 16px;
+    }
 }
 
 /* Loading spinner */

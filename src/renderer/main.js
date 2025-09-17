@@ -12,11 +12,17 @@ class LawnmowerApp {
         this.messageCount = 0;
         this.currentTab = 'map';
         this.isInitialized = false;
+        
+        // Initialize device manager
+        this.deviceManager = null;
     }
 
     async initialize() {
         try {
             console.log('Initializing Lawnmower App...');
+            
+            // Initialize device manager
+            this.deviceManager = new window.DeviceManager(this);
             
             // Initialize event listeners
             this.setupEventListeners();
@@ -387,17 +393,17 @@ class LawnmowerApp {
         // Full message UI will be implemented in the visualization milestone
     }
 
-    // Dialog placeholders - to be implemented in device management milestone
+    // Device management methods - now implemented
     showAddMowerDialog() {
-        this.showToast('Add mower dialog - coming in next milestone', 'info');
+        this.deviceManager.showAddMowerDialog();
     }
 
     showEditMowerDialog() {
-        this.showToast('Edit mower dialog - coming in next milestone', 'info');
+        this.deviceManager.showEditMowerDialog();
     }
 
     showDeleteMowerDialog() {
-        this.showToast('Delete mower dialog - coming in next milestone', 'info');
+        this.deviceManager.showDeleteMowerDialog();
     }
 
     showImportDialog() {
