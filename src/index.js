@@ -22,7 +22,7 @@ const createWindow = () => {
       enableRemoteModule: false,
       nodeIntegration: false
     },
-    icon: path.join(__dirname, 'assets/logo.svg'),
+    icon: path.join(__dirname, 'assets/GreenBotSolutions.svg'),
     title: 'GreenBot Lawnmower Cockpit',
     show: false // Don't show until ready
   });
