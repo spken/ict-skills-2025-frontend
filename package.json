@@ -1,8 +1,8 @@
 {
-  "name": "ict-skills-2025-frontend",
-  "productName": "ict-skills-2025-frontend",
+  "name": "lawnmower-cockpit",
+  "productName": "GreenBot Lawnmower Cockpit",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "GreenBot Solutions AG Lawnmower Management Application",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -11,13 +11,26 @@
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
-  "keywords": [],
+  "keywords": ["lawnmower", "greenbot", "iot", "management"],
   "author": {
     "name": "spken",
     "email": "134706997+spken@users.noreply.github.com"
   },
   "license": "MIT",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "@microsoft/signalr": "^8.0.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.9.0",
+    "@electron-forge/maker-deb": "^7.9.0",
+    "@electron-forge/maker-rpm": "^7.9.0",
+    "@electron-forge/maker-squirrel": "^7.9.0",
+    "@electron-forge/maker-zip": "^7.9.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.9.0",
+    "@electron-forge/plugin-fuses": "^7.9.0",
+    "@electron/fuses": "^1.8.0",
+    "electron": "38.1.0"
   }
 }
